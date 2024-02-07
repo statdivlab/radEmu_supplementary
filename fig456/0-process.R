@@ -13,7 +13,15 @@
 library(tidyverse)
 library(splines2)
 
-devtools::load_all(path="../radEmu/")
+### If you'd like to reproduce the results from the preprint, you should load
+### release v1.0.0 (available on GitHub).
+### We are going to ensure backwards compatibility of syntax, but if we make
+### improvements to the software then future releases may result in different results (probably slight).
+### We mention this just because we don't want you to be upset if you run a newer version
+### and things are slightly different.
+
+### As the developers, we just loaded it locally as follows.
+# devtools::load_all(path="../radEmu/")
 
 ############################
 ###### Download Data ######

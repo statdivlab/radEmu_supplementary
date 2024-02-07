@@ -4,6 +4,8 @@ This repository contains code to reproduce the results and figures of our manusc
 
 Code to create each figure is contained within the relevant labeled subfolder. Our robust score test p-values are available as `our_ps_compare.RDS` in the top-level directory. 
 
+For perfect reproducibility, please load v1.0.0 of `radEmu`, which is available at its [GitHub](https://github.com/statdivlab/radEmu). 
+
 Is something missing? Let us know by emailing Amy or opening an issue. 
 
 We are grateful to Wirbel et al (the authors of the colorectal cancer metaanalysis) for making their data publicly available and easy to download. Code to download their data is available in `fig456/0-process.R` and reproduced below for your convenience:
