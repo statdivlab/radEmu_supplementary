@@ -18,7 +18,7 @@ tt_ef <- system.time({
                           tolerance = 0.01,
                           test_kj = data.frame(k = 2,
                                                j = 1:ncol(Y)),
-                          return_wald_p = TRUE, ## FALSE, ## TRUE?
+                          return_wald_p = TRUE,
                           compute_cis = TRUE,
                           run_score_tests = FALSE,
                           verbose = TRUE)
