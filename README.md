@@ -2,7 +2,7 @@
 
 This repository contains code to reproduce the results and figures of our manuscript "Estimating Fold Changes from Partially Observed Outcomes with Applications in Microbial Metagenomics" by David Clausen and Amy Willis. 
 
-Code to create each figure is contained within the relevant labeled subfolder. 
+Code to create each figure is contained within the relevant labeled subfolder. Our robust score test p-values are available as `our_ps_compare.RDS` in the top-level directory. 
 
 Is something missing? Let us know by emailing Amy or opening an issue. 
 
