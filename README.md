@@ -1,4 +1,4 @@
-## Code to reproduce the results of 
+## Supplementary Code for `radEmu` manuscript
 
 This repository contains code to reproduce the results and figures of our manuscript "Estimating Fold Changes from Partially Observed Outcomes with Applications in Microbial Metagenomics" by David Clausen and Amy Willis. 
 
