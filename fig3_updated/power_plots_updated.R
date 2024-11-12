@@ -1,6 +1,6 @@
 library(tidyverse)
 
-files <- list.files("fig2_updated/results", full.names=T)
+files <- list.files("fig3_updated/results", full.names=T)
 
 results <- vector(length(files), mode = "list")
 counter <- 1
@@ -16,12 +16,12 @@ results
 ### confirm n_sim=10000 (yes)
 results %>%
   tibble %>%
-  group_by(n, J, distn) %>%
+  group_by(n, J, distn, alt) %>%
   summarise(n())
 
 plot_res <- results %>%
   dplyr::select(-contains("est")) %>%
-  pivot_longer(5:10, names_to = "method", values_to = "pval") %>%
+  pivot_longer(6:11, names_to = "method", values_to = "pval") %>%
   mutate(n = factor(n, levels = c(10,50,250))) %>%
   mutate(J = factor(J, levels = c(10,50,250))) %>%
   mutate(distn_J = paste("Y ~ ", distn,"\n",J," Taxa",sep = "")) %>%
@@ -39,34 +39,28 @@ plot_res <- results %>%
                                      ifelse(method == "deseq_p", "DESeq2",
                                             ifelse(method == "wald_p",
                                                    "radEmu robust Wald test",
-                                                   "radEmu robust score test")))))) 
+                                                   "radEmu robust score test")))))) %>%
+  group_by(n, distn_J, test, alt) %>%
+  summarise(power = mean(pval <= 0.05, na.rm = T))
+
 ggplot(plot_res) +
-  geom_qq(distribution = stats::qunif,
-          aes(sample = pval,
-              color = test
-          ), geom="line",
-          linewidth = 0.5) +
-  geom_abline(aes(intercept = 0, slope = 1),linetype= "dotted") +
-  facet_grid(n~distn_J) +
-  labs(color = "Test") +
-  xlab("Theoretical p-value quantiles") +
-  ylab("Empirical p-value quantiles") +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank()) +
-  #scale_color_manual(values=c("#3446eb",  "#56B4E9")) + # "#208f1a",
-  theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 60, size=6,hjust= 1),
-        axis.text.y = element_text(size = 6)) +
-  scale_x_sqrt(breaks=c(0,0.01,0.05,0.25,0.5,1)) +
-  scale_y_sqrt(breaks = c(0,0.01,0.05,0.25,0.5,1)) +
+  geom_line(aes(x = alt, y = power, color = test)) + 
+  facet_grid(distn_J ~ n) + 
+  ggtitle("Power simulations") + 
+  labs(x = expression(paste(beta[1])),
+       y = "Power",
+       linetype = "Sample size",
+       color = "Test") + 
+  theme_bw() + 
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(hjust = 0.5)) +
+  guides(color = guide_legend(position = "bottom", nrow = 3),
+         linetype = "none") + 
+  #scale_linetype_manual(values=c(2, 2, 2, 4, 2)) + 
+  xlim(c(0,5)) + 
   coord_equal() +
   NULL
-ggsave("fig2_updated/t1e.pdf", height = 8, width = 12)
-
-plot_res %>% group_by(n, distn_J, test) %>%
-  filter(test == "radEmu robust score test") %>%
-  summarise(mean(pval <= 0.05, na.rm = T)) %>%
-  print(n = 108)
+ggsave("fig3_updated/power.pdf", height = 8, width = 12)
 
 # estimates
 plot_res <- results %>%
@@ -86,10 +80,8 @@ plot_res <- results %>%
   mutate(test = ifelse(method == "aldex_est", "ALDEx2", 
                        ifelse(method == "ancom_est", "ANCOM-BC2", 
                               ifelse(method == "clr_est", "CLR t-test",
-                                     ifelse(method == "deseq_est", "DESeq2", "radEmu"))))) %>%
-  mutate(corrected_est = ifelse(test %in% c("ALDEx2", "DESeq2"),
-                                est*log(2), est))
-ggplot(plot_res, aes(x = n, y = corrected_est)) + 
+                                     ifelse(method == "deseq_est", "DESeq2", "radEmu"))))) 
+ggplot(plot_res, aes(x = n, y = est)) + 
   geom_hline(aes(yintercept = 0), color = "red") + 
   geom_boxplot() + 
   facet_grid(distn_J~test) + 
