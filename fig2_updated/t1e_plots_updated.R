@@ -32,7 +32,10 @@ plot_res <- results %>%
                               "Y ~ Poisson\n250 Taxa",
                               "Y ~ ZINB\n10 Taxa",
                               "Y ~ ZINB\n50 Taxa",
-                              "Y ~ ZINB\n250 Taxa"))) %>%
+                              "Y ~ ZINB\n250 Taxa")),
+         n = paste0("n = ", n)) %>%
+  mutate(n = factor(n, levels = 
+                      c("n = 10", "n = 50", "n = 250"))) %>% 
   mutate(test = ifelse(method == "aldex_p", "ALDEx2", 
                        ifelse(method == "ancom_p", "ANCOM-BC2", 
                               ifelse(method == "clr_p", "CLR t-test",
@@ -60,6 +63,9 @@ ggplot(plot_res) +
   scale_x_sqrt(breaks=c(0,0.01,0.05,0.25,0.5,1)) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.25,0.5,1)) +
   coord_equal() +
+  scale_color_manual(values = c("#E69F00", "#CC79A7", 
+                                "#661100", "#009E73", 
+                                "#3446eb",  "#56B4E9"))
   NULL
 ggsave("fig2_updated/t1e.pdf", height = 8, width = 12)
 
@@ -82,7 +88,10 @@ plot_res <- results %>%
                               "Y ~ Poisson\n250 Taxa",
                               "Y ~ ZINB\n10 Taxa",
                               "Y ~ ZINB\n50 Taxa",
-                              "Y ~ ZINB\n250 Taxa"))) %>%
+                              "Y ~ ZINB\n250 Taxa")),
+         n = paste0("n = ", n)) %>%
+  mutate(n = factor(n, levels = 
+                      c("n = 10", "n = 50", "n = 250"))) %>% 
   mutate(test = ifelse(method == "aldex_est", "ALDEx2", 
                        ifelse(method == "ancom_est", "ANCOM-BC2", 
                               ifelse(method == "clr_est", "CLR t-test",
