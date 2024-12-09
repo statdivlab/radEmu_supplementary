@@ -106,3 +106,5 @@ ggplot(plot_res, aes(x = n, y = corrected_est)) +
   labs(x = "Sample size",
        y = "Estimate")
 ggsave("fig2_updated/bias.pdf", height = 8, width = 12)
+
+summary(plot_res %>% filter(test == "ALDEx2") %>% pull(pval))
