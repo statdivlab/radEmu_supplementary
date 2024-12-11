@@ -24,6 +24,16 @@ for (ind in 1:length(files)) {
 # check on number na's for each row in each permutation
 deseq_na <- unlist(lapply(df_list, function(x) {sum(is.na(x[, 5]))}))
 
+# radEmu wald test
+files <- list.files("wirbel_permute/results/", full.names = T)
+is_wald <- sapply(files, function(x) grepl("wald", x, fixed = TRUE))
+files <- files[is_wald]
+wald_list <- vector(mode = "list", length = length(files))
+
+for (ind in 1:length(files)) {
+  wald_list[[ind]] <- readRDS(files[ind])$wald_p[1:845]
+}
+
 # check on significant qvals
 # aldex
 qval <- lapply(other_methods, function(x) {qvalue::qvalue(x[, 5], pi0 = 1)$qvalues})
@@ -38,6 +48,9 @@ clr_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
 # deseq 
 qval <- lapply(df_list, function(x) {qvalue::qvalue(x[, 5])$qvalues})
 deseq_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
+# radEmu wald
+qval <- lapply(wald_list[1:20], function(x) {qvalue::qvalue(x)$qvalues})
+wald_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
 
 # score tests, see what has run
 Y <- readRDS("wirbel_permute/data/Y.rds")
@@ -91,7 +104,6 @@ for (ind in 1:nrow(all_rerun)) {
   perm <- all_rerun$perm[ind]
   score_list[[perm]] <- rbind(score_list[[perm]], all_rerun[ind, ])
 }
-lapply(score_list, dim)
 
 # compare q-values, including 23 NA values across 20 permutations 
 qval <- lapply(score_list, function(x) {qvalue::qvalue(x[, 4])$qvalues})
@@ -102,3 +114,13 @@ score_list_0 <- lapply(score_list, function(x) {
 qval <- lapply(score_list_0, function(x) {qvalue::qvalue(x[, 4])$qvalues})
 score_sum_small_0 <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
 unlist(lapply(score_list, function(x) {sum(is.na(x[, 4]))}))
+
+# compare results 
+summary(aldex_sum_small[1:20])
+summary(ancom_sum_small[1:20])
+summary(ancom_sum_small_ss[1:20])
+summary(clr_sum_small[1:20])
+summary(deseq_sum_small[1:20])
+summary(score_sum_small)
+summary(wald_sum_small)
+
