@@ -105,15 +105,15 @@ for (ind in 1:nrow(all_rerun)) {
   score_list[[perm]] <- rbind(score_list[[perm]], all_rerun[ind, ])
 }
 
-# compare q-values, including 23 NA values across 20 permutations 
+# compare q-values
 qval <- lapply(score_list, function(x) {qvalue::qvalue(x[, 4])$qvalues})
 score_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
-score_list_0 <- lapply(score_list, function(x) {
-  x %>% mutate(score_p = ifelse(is.na(score_p), 0, score_p))
+min_val <- min(unlist(lapply(score_list, function(x){min(x[,4], na.rm = T)})))
+score_list_min <- lapply(score_list, function(x) {
+  x %>% mutate(score_p = ifelse(is.na(score_p), min_val, score_p))
 })
-qval <- lapply(score_list_0, function(x) {qvalue::qvalue(x[, 4])$qvalues})
-score_sum_small_0 <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
-unlist(lapply(score_list, function(x) {sum(is.na(x[, 4]))}))
+qval <- lapply(score_list_min, function(x) {qvalue::qvalue(x[, 4])$qvalues})
+score_sum_small_min <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
 
 # compare results 
 summary(aldex_sum_small[1:20])
