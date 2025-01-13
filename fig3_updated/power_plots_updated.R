@@ -77,49 +77,23 @@ for (row in 1:nrow(plot_res)) {
 
 ggplot(plot_res %>% filter(valid)) +
   geom_line(aes(x = alt, y = power, color = test, linetype = test)) + 
-  facet_grid(distn_J ~ n) + 
+  facet_grid(n ~ distn_J) + 
   ggtitle("Power simulations") + 
   labs(x = expression(paste(beta[1])),
        y = "Power",
        color = "Test") + 
-  theme_bw() + 
+  theme_bw(base_size = 20) + 
   theme(panel.grid.minor = element_blank(),
-        plot.title = element_text(hjust = 0.5)) +
+        plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12)) +
   guides(color = guide_legend(position = "bottom", nrow = 2),
          linetype = "none") + 
   scale_linetype_manual(values=c(6, 5, 4, 4, 1, 2)) + 
   xlim(c(0,5)) + 
-  coord_equal() +
   scale_color_manual(values = c("#E69F00", "#CC79A7", 
                                 "#661100", "#009E73", 
                                 "#3446eb",  "#56B4E9")) + 
   NULL
 ggsave("fig3_updated/power.pdf", height = 8, width = 12)
 
-# estimates
-plot_res <- results %>%
-  dplyr::select(-contains("_p")) %>%
-  pivot_longer(5:9, names_to = "method", values_to = "est") %>%
-  mutate(n = factor(n, levels = c(10,50,250))) %>%
-  mutate(J = factor(J, levels = c(10,50,250))) %>%
-  mutate(distn_J = paste("Y ~ ", distn,"\n",J," Taxa",sep = "")) %>%
-  mutate(distn_J = factor(distn_J,
-                          levels =
-                            c("Y ~ Poisson\n10 Taxa",
-                              "Y ~ Poisson\n50 Taxa",
-                              "Y ~ Poisson\n250 Taxa",
-                              "Y ~ ZINB\n10 Taxa",
-                              "Y ~ ZINB\n50 Taxa",
-                              "Y ~ ZINB\n250 Taxa"))) %>%
-  mutate(test = ifelse(method == "aldex_est", "ALDEx2", 
-                       ifelse(method == "ancom_est", "ANCOM-BC2", 
-                              ifelse(method == "clr_est", "CLR t-test",
-                                     ifelse(method == "deseq_est", "DESeq2", "radEmu"))))) 
-ggplot(plot_res, aes(x = n, y = est)) + 
-  geom_hline(aes(yintercept = 0), color = "red") + 
-  geom_boxplot() + 
-  facet_grid(distn_J~test) + 
-  theme_bw() + 
-  labs(x = "Sample size",
-       y = "Estimate")
-ggsave("fig2_updated/bias.pdf", height = 8, width = 12)

@@ -54,12 +54,12 @@ ggplot(plot_res) +
   labs(color = "Test") +
   xlab("Theoretical p-value quantiles") +
   ylab("Empirical p-value quantiles") +
-  theme_bw() +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank()) +
   #scale_color_manual(values=c("#3446eb",  "#56B4E9")) + # "#208f1a",
   theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 60, size=6,hjust= 1),
-        axis.text.y = element_text(size = 6)) +
+        axis.text.x = element_text(size = 12, angle = 60, hjust= 1),
+        axis.text.y = element_text(size = 12)) +
   scale_x_sqrt(breaks=c(0,0.01,0.05,0.25,0.5,1)) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.25,0.5,1)) +
   coord_equal() +
@@ -102,9 +102,10 @@ ggplot(plot_res, aes(x = n, y = corrected_est)) +
   geom_hline(aes(yintercept = 0), color = "red") + 
   geom_boxplot() + 
   facet_grid(distn_J~test) + 
-  theme_bw() + 
+  theme_bw(base_size = 18) + 
   labs(x = "Sample size",
-       y = "Estimate")
+       y = "Estimate") + 
+  theme(axis.text.x = element_text(size = 12))
 ggsave("fig2_updated/bias.pdf", height = 8, width = 12)
 
 summary(plot_res %>% filter(test == "ALDEx2") %>% pull(pval))
