@@ -224,7 +224,7 @@ system.time({
 ancombc_results %>% names
 
 
-ancombc_ps <- tibble("category" = ancombc_results$res %>% rownames,
+ancombc_ps <- tibble("category" = ancombc_results$res$taxon,
                      "p_ancombc2" = ancombc_results$res$p_groupCRC)
 
 #########################
@@ -240,7 +240,7 @@ ps_df <- ps_compare %>%
   inner_join(ald_ps %>% enframe(name="category", value = "p_aldex")) %>%
   inner_join(deseq_ps %>% enframe(name="category", value = "p_deseq2")) %>%
   inner_join(ancombc_ps) %>%
-  inner_join(ifaa_ps %>% rename(category = taxon)) %>%
+  inner_join(ifaa_ps %>% dplyr::rename(category = taxon)) %>%
   dplyr::inner_join(wirb_orig_small, by = c("category" = "species")) %>%
   mutate(t_r = -log10(pval_score),
          t_c = -log10(p_corncob),
