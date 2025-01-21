@@ -70,7 +70,7 @@ ggplot(plot_res) +
 ggsave("fig2_updated/t1e.pdf", height = 8, width = 12)
 
 plot_res %>% group_by(n, distn_J, test) %>%
-  filter(test == "radEmu robust score test") %>%
+ # filter(test == "radEmu robust score test") %>%
   summarise(mean(pval <= 0.05, na.rm = T)) %>%
   print(n = 108)
 

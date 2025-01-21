@@ -34,6 +34,16 @@ for (ind in 1:length(files)) {
   wald_list[[ind]] <- readRDS(files[ind])$wald_p[1:845]
 }
 
+# ifaa 
+files <- list.files("wirbel_permute/results/", full.names = T)
+is_ifaa <- sapply(files, function(x) grepl("ifaa", x, fixed = TRUE))
+files <- files[is_ifaa]
+ifaa_list <- vector(mode = "list", length = length(files))
+
+for (ind in 1:length(files)) {
+  ifaa_list[[ind]] <- readRDS(files[ind])$ifaa_p[1:845]
+}
+
 # check on significant qvals
 # aldex
 qval <- lapply(other_methods, function(x) {qvalue::qvalue(x[, 5], pi0 = 1)$qvalues})
@@ -51,6 +61,9 @@ deseq_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
 # radEmu wald
 qval <- lapply(wald_list[1:20], function(x) {qvalue::qvalue(x)$qvalues})
 wald_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
+# ifaa 
+qval <- lapply(ifaa_list, function(x) {qvalue::qvalue(x)$qvalues})
+ifaa_sum_small <- unlist(lapply(qval, function(x) {sum(x <= 0.05, na.rm = T)}))
 
 # score tests, see what has run
 Y <- readRDS("wirbel_permute/data/Y.rds")
@@ -123,4 +136,5 @@ summary(clr_sum_small[1:20])
 summary(deseq_sum_small[1:20])
 summary(score_sum_small)
 summary(wald_sum_small)
+summary(ifaa_sum_small)
 
