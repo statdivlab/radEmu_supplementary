@@ -16,7 +16,7 @@ library(corncob)
 library(ALDEx2)
 library(DESeq2)
 library(magrittr)
-# devtools::install_github("gitlzg/IFAA")
+# BiocManager::install("IFAA")
 library(IFAA)
 # BiocManager::install("ANCOMBC")
 library(ANCOMBC)
@@ -34,14 +34,14 @@ ps <- phyloseq(sd, otus)
 xx %>% colnames
 
 # system.time({
-#   dt_cc <- differentialTest(formula = ~ groupCRC + agespline1 + agespline2 + bmispline1 + bmispline2 +
-#                               genderM + samplingAfter + studyUS + studyCN + studyDE + studyAT,
-#                             formula_null = ~ agespline1 + agespline2 + bmispline1 + bmispline2 +
-#                               genderM + samplingAfter + studyUS + studyCN + studyDE + studyAT,
-#                             phi.formula= ~ samplingAfter + studyUS + studyCN + studyDE + studyAT,
-#                             phi.formula_null= ~ samplingAfter + studyUS + studyCN + studyDE + studyAT,
-#                             data=ps,
-#                             test="LRT")
+  # dt_cc <- differentialTest(formula = ~ groupCRC + agespline1 + agespline2 + bmispline1 + bmispline2 +
+  #                             genderM + samplingAfter + studyUS + studyCN + studyDE + studyAT,
+  #                           formula_null = ~ agespline1 + agespline2 + bmispline1 + bmispline2 +
+  #                             genderM + samplingAfter + studyUS + studyCN + studyDE + studyAT,
+  #                           phi.formula= ~ samplingAfter + studyUS + studyCN + studyDE + studyAT,
+  #                           phi.formula_null= ~ samplingAfter + studyUS + studyCN + studyDE + studyAT,
+  #                           data=ps,
+  #                           test="LRT")
 # })
 # system("say done")
 # saveRDS(dt_cc, "wirbel-corncob.RDS")
@@ -116,7 +116,7 @@ res <- results(deseq_res)
 # res <- results(dds)
 
 deseq_ps <- res$pvalue
-names(deseq_ps) <- rownames(psdeseq)
+names(deseq_ps) <- rownames(res)
 
 #########################
 ##### IFAA #####
@@ -136,7 +136,8 @@ system.time({
 # user  system elapsed
 # 19.194   2.402 279.032
 
-# saveRDS(ifaa_results, "ifaa_results.RDS")
+# saveRDS(ifaa_results, "wirbel-ifaa.RDS")
+ifaa_results <- readRDS("wirbel-ifaa.RDS")
 
 ifaa_results %>% names
 ifaa_results$full_results %>% names
@@ -181,30 +182,30 @@ tse %>% class
 
 experimental_data2 <- TreeSummarizedExperiment(assays = list("shotgun" = t(Y)),
                                                colData= X[, -1])
-system.time({
-  ancom_results <- ancom(data = experimental_data2,
-                         assay_name = "shotgun",
-                         p_adj_method = "none",
-                         phyloseq = NULL,
-                         tax_level="Species",
-                         main_var = "groupCRC",
-                         # prv_cut = ### TODO,
-                         adj_formula = "agespline1 + agespline2 + bmispline1 + bmispline2 + genderM + samplingAfter + studyUS + studyCN + studyDE + studyAT",
-                         alpha = 0.05, n_cl = 6)
-})
-#   user  system elapsed
-# 2.444   1.961 840.977
-system("say done")
-
-ancom_results %>% names
-ancom_results$p_data %>% class
-ancom_results$p_data %>% dim # 552 x 552
-ancom_results$res %>% as_tibble
-ancom_results$res %>% names
-ancom_results$beta_data %>% dim # 552 x 552
-
-ancom_results$q_data %>% dim
-ancom_results$q_data[1:5, 1:5]
+# system.time({
+#   ancom_results <- ancom(data = experimental_data2,
+#                          assay_name = "shotgun",
+#                          p_adj_method = "none",
+#                          phyloseq = NULL,
+#                          tax_level="Species",
+#                          main_var = "groupCRC",
+#                          # prv_cut = ### TODO,
+#                          adj_formula = "agespline1 + agespline2 + bmispline1 + bmispline2 + genderM + samplingAfter + studyUS + studyCN + studyDE + studyAT",
+#                          alpha = 0.05, n_cl = 6)
+# })
+# #   user  system elapsed
+# # 2.444   1.961 840.977
+# system("say done")
+# 
+# ancom_results %>% names
+# ancom_results$p_data %>% class
+# ancom_results$p_data %>% dim # 552 x 552
+# ancom_results$res %>% as_tibble
+# ancom_results$res %>% names
+# ancom_results$beta_data %>% dim # 552 x 552
+# 
+# ancom_results$q_data %>% dim
+# ancom_results$q_data[1:5, 1:5]
 
 ### I have no idea what to do with 552 p-values per taxon.
 
@@ -220,6 +221,7 @@ system.time({
 })
 # user  system elapsed
 # 31.220   1.616 297.254
+saveRDS(ancombc_results, "wirbel-ancombc2.RDS")
 
 ancombc_results %>% names
 
@@ -276,11 +278,12 @@ rad_aldex <- ps_df %>%
   ylab(expression(paste("-lo", g[10], "(", p[ALDEx2], ")"), parse = TRUE)) +
   scale_color_manual(values=c("black",  "blue")) +
   NULL
-
+summary(ps_df$p_aldex)
 
 rad_deseq <- ps_df %>%
   mutate(`Missing p-value` = is.na(t_d)) %>%
   mutate(t_d = ifelse(is.na(t_d), 25, t_d)) %>%
+  mutate(t_d = ifelse(t_d > 25, 25, t_d)) %>% 
   ggplot(aes(x = t_r, y = t_d)) +
   geom_point(cex = 0.1, aes(col = `Missing p-value`)) +
   geom_abline() +
@@ -327,6 +330,7 @@ rad_ifaa <- ps_df %>%
 rad_ancom <- ps_df %>%
   mutate(`Missing p-value` = is.na(p_ancombc2)) %>%
   mutate(t_an = ifelse(is.na(t_an), 25, t_an)) %>%
+  mutate(t_an = ifelse(t_an > 25, 25, t_an)) %>%
   ggplot(aes(x = t_r, y = t_an)) +
   geom_point(cex = 0.1, aes(col = `Missing p-value`)) +
   geom_abline() +
@@ -357,3 +361,32 @@ c(ps_df %>% with(cor(p_corncob, pval_score,method = "spearman", use = "complete.
   ps_df %>% with(cor(p_ifaa, pval_score,method = "spearman", use = "complete.obs")),
   ps_df %>% with(cor(p_ancombc2, pval_score,method = "spearman", use = "complete.obs")),
   ps_df %>% with(cor(pval.meta, pval_score,method = "spearman", use = "complete.obs"))) %>% round(2)
+
+# ------------------- compare estimates -----------------------------------
+est_df <- ps_compare %>%
+  #inner_join(dt_cc$p %>% enframe(name="category", value = "p_corncob")) %>%
+  inner_join(data.frame(category = rownames(ald_glm), ald_est = ald_glm$`groupCRC:Est`*log(2))) %>%
+  inner_join(data.frame(category = rownames(res), deseq_est = res$log2FoldChange*log(2))) %>%
+  inner_join(data.frame(category = ancombc_results$res$taxon, ancom_est = ancombc_results$res$lfc_groupCRC)) %>%
+  inner_join(data.frame(category = ifaa_ps$taxon, ifaa_est = ifaa_results$full_results$estimate)) 
+c(est_df %>% with(cor(ald_est, estimate, method = "spearman", use = "complete.obs")),
+  est_df %>% with(cor(deseq_est, estimate, method = "spearman", use = "complete.obs")),
+  est_df %>% with(cor(ancom_est, estimate, method = "spearman", use = "complete.obs")),
+  est_df %>% with(cor(ifaa_est, estimate, method = "spearman", use = "complete.obs"))) %>% round(2)
+
+est_long <- est_df %>%
+  dplyr::select(estimate, ald_est, ancom_est, deseq_est, ifaa_est) %>%
+  pivot_longer(cols = -estimate, names_to = "method", values_to = "value")
+# Create ggplot
+ggplot(est_long, aes(x = estimate, y = value)) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~method) + 
+  labs(
+    x = "Estimate",
+    y = "Values",
+    color = "Method",
+    title = "Comparison of Estimates"
+  ) + 
+  ylim(-5, 5) +
+  geom_abline(aes(slope = 1, intercept = 0), color = "red")
