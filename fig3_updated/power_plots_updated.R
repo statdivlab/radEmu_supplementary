@@ -78,7 +78,7 @@ for (row in 1:nrow(plot_res)) {
 ggplot(plot_res %>% filter(valid)) +
   geom_line(aes(x = alt, y = power, color = test, linetype = test)) + 
   facet_grid(n ~ distn_J) + 
-  ggtitle("Power simulations") + 
+  #ggtitle("Power simulations") + 
   labs(x = expression(paste(beta[1])),
        y = "Power",
        color = "Test", linetype = "Test") + 
