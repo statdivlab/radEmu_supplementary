@@ -43,15 +43,32 @@ plot_res <- results %>%
                                             ifelse(method == "wald_p",
                                                    "radEmu robust Wald test",
                                                    "radEmu robust score test")))))) 
-ggplot(plot_res) +
+
+# see which methods have fewer than 5% of NA's in each setting
+na_res <- plot_res %>%
+  group_by(test, n, distn_J) %>%
+  summarise(prop_na = mean(is.na(pval))) %>%
+  mutate(too_many_na = ifelse(prop_na > 0.05, TRUE, FALSE))
+plot_res$too_many_na <- NA
+for (row in 1:nrow(plot_res)) {
+  n <- plot_res$n[row]
+  distn_J <- plot_res$distn_J[row]
+  test <- plot_res$test[row]
+  plot_res$too_many_na[row] <- na_res$too_many_na[na_res$n == n & na_res$distn_J == distn_J &
+                                                    na_res$test == test]
+}
+
+plot_res %>% filter(!too_many_na) %>%
+ggplot() +
   geom_qq(distribution = stats::qunif,
           aes(sample = pval,
-              color = test
+              color = test, linetype = test
           ), geom="line",
           linewidth = 0.5) +
-  geom_abline(aes(intercept = 0, slope = 1),linetype= "dotted") +
+  #geom_abline(aes(intercept = 0, slope = 1),linetype= "dotted") +
+  geom_abline(aes(intercept = 0, slope = 1)) +
   facet_grid(n~distn_J) +
-  labs(color = "Test") +
+  labs(color = "Test", linetype = "Test") +
   xlab("Theoretical p-value quantiles") +
   ylab("Empirical p-value quantiles") +
   theme_bw(base_size = 20) +
@@ -65,12 +82,13 @@ ggplot(plot_res) +
   coord_equal() +
   scale_color_manual(values = c("#E69F00", "#CC79A7", 
                                 "#661100", "#009E73", 
-                                "#3446eb",  "#56B4E9"))
+                                "#3446eb",  "#56B4E9")) + 
+  scale_linetype_manual(values = c("dashed", "longdash", "dotdash", "dotted", "solid", "twodash"))
   NULL
 ggsave("fig2_updated/t1e.pdf", height = 8, width = 12)
 
 plot_res %>% group_by(n, distn_J, test) %>%
-  filter(test == "radEmu robust score test") %>%
+ # filter(test == "radEmu robust score test") %>%
   summarise(mean(pval <= 0.05, na.rm = T)) %>%
   print(n = 108)
 

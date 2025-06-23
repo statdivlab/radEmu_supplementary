@@ -59,7 +59,8 @@ plot_res <- full_res %>%
                                                    "radEmu robust Wald test",
                                                    "radEmu robust score test")))))) %>%
   group_by(n, distn_J, test, alt) %>%
-  summarise(power = mean(pval <= 0.05, na.rm = T))
+  summarise(power = mean(pval <= 0.05, na.rm = T),
+            prop_na = mean(is.na(pval)))
 
 # see which methods control type 1 error rate for each setting
 upper_lim <- 0.05 + qnorm(0.975) * sqrt(0.05 * 0.95 / 500)
@@ -75,21 +76,37 @@ for (row in 1:nrow(plot_res)) {
                            t1e_res$test == test]
 }
 
-ggplot(plot_res %>% filter(valid)) +
+# see which methods have fewer than 5% of NA's in each setting
+na_res <- plot_res %>%
+  group_by(test, n, distn_J) %>%
+  summarise(prop_na = mean(prop_na)) %>%
+  mutate(too_many_na = ifelse(prop_na > 0.05, TRUE, FALSE))
+plot_res$too_many_na <- NA
+for (row in 1:nrow(plot_res)) {
+  n <- plot_res$n[row]
+  distn_J <- plot_res$distn_J[row]
+  test <- plot_res$test[row]
+  plot_res$too_many_na[row] <- na_res$too_many_na[na_res$n == n & na_res$distn_J == distn_J &
+                                                    na_res$test == test]
+}
+
+plot_res %>% filter(valid, !too_many_na) %>% 
+ggplot() +
   geom_line(aes(x = alt, y = power, color = test, linetype = test)) + 
   facet_grid(n ~ distn_J) + 
-  ggtitle("Power simulations") + 
+  #ggtitle("Power simulations") + 
   labs(x = expression(paste(beta[1])),
        y = "Power",
-       color = "Test") + 
+       color = "Test", linetype = "Test") + 
   theme_bw(base_size = 20) + 
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12)) +
   guides(color = guide_legend(position = "bottom", nrow = 2),
-         linetype = "none") + 
-  scale_linetype_manual(values=c(6, 5, 4, 4, 1, 2)) + 
+         linetype = guide_legend(position = "bottom", nrow = 2)) + 
+  #scale_linetype_manual(values=c(6, 5, 4, 4, 1, 2)) + 
+  scale_linetype_manual(values = c("dashed", "longdash", "dotdash", "dotted", "solid", "twodash")) + 
   xlim(c(0,5)) + 
   scale_color_manual(values = c("#E69F00", "#CC79A7", 
                                 "#661100", "#009E73", 
