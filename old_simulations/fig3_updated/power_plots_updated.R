@@ -1,6 +1,6 @@
 library(tidyverse)
 
-files <- list.files("fig3_updated/results", full.names=T)
+files <- list.files("old_simulations/fig3_updated/results", full.names=T)
 
 results <- vector(length(files), mode = "list")
 counter <- 1

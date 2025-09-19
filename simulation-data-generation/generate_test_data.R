@@ -82,34 +82,25 @@ generate_test_data <- function(n, # number of samples
   return(Y)
 }
 
-generate_test_data_testing <- function(n, # number of samples
-                               J, # number of taxa
-                               b0 = NULL, # intercept (optional, required if B is null)
-                               b1 = NULL, # beta_1 vector (optional, required if B is null)
-                               distn, # distribution: Poisson or ZINB
-                               zinb_size = NULL, # size argument for negative binomial distribution for ZINB data
-                               zinb_zero_prop = NULL, # proportion zeros in ZINB data
-                               mean_count_before_ZI, # expected z parameter for sample with mean expected count of 0
-                               X = NULL, # design matrix (optional)
-                               B = NULL, # B matrix (optional, required if b0 and b1 are NULL)
-                               cluster = NULL ) { # cluster vector (optional)
+generate_test_data_include_delta <- function(n, # number of samples
+                                             J, # number of taxa
+                                             distn, # distribution: Poisson or ZINB
+                                             zinb_size = NULL, # size argument for negative binomial distribution for ZINB data
+                                             zinb_zero_prop = NULL, # proportion zeros in ZINB data
+                                             mean_count_before_ZI, # expected z parameter for sample with mean expected count of 0
+                                             X, # design matrix
+                                             B, # B matrix 
+                                             cluster = NULL ) { # cluster vector (optional)
   
-  if (is.null(X)) {
-    X <- cbind(1,rep(c(0,1),each = n/2))
-  }
-  if (!is.null(b0) & !is.null(b1)) {
-    B <- rbind(b0,b1)
-    if (nrow(B) != ncol(X)) {
-      stop("You've input b0 and b1 but your X matrix does not have 2 columns. Please use the B argument when your design matrix does not have 2 columns.")
-    }
-  } else if (is.null(b0) | is.null(b1)) {
-    if (is.null(B)) {
-      stop("Please input either parameter vectors b0 and b1, or parameter matrix B.")
-    }
-  }
+  
+  delta_j <- seq(from = -1, to = 1, length.out = J)
+  perm_delta_j <- delta_j
+  ind_keep <- c(ceiling(J / 4), J / 2, ceiling(3 * J / 4))
+  perm_delta_j[-ind_keep] <- sample(delta_j[-ind_keep], J - 3, replace = FALSE)
+  
   log_means <- do.call(cbind,
                        lapply(1:J,
-                              function(j) X%*%B[,j,drop = FALSE]))
+                              function(j) X%*%B[,j,drop = FALSE] + perm_delta_j[j]))
   
   row_means <- rowSums(exp(log_means))/J
   
