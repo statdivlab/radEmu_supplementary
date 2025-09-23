@@ -154,5 +154,5 @@ generate_test_data_include_delta <- function(n, # number of samples
     }
   }
   
-  return(list(Y = Y, z = z))
+  return(list(Y = Y, z = z, log_means = log_means))
 }
