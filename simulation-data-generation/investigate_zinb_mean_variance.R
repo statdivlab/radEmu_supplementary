@@ -34,11 +34,13 @@ for (sim in 1:500) {
 hist(as.vector(res_logmean))
 summary(exp(as.vector(res_logmean)))
 summary(as.vector(res_logmean))
+mean(exp(as.vector(res_logmean)) <= 1.875) # 1.875 is the value at which the two functions cross
 
 hist(log(as.vector(res_Y)))
 summary(as.vector(res_Y))
 
 # theoretically, expect var(Y) = .4mu + .32mu^2 
+library(latex2exp)
 
 fn <- function(x) {
   return(.4 * x + .32 * x^2)
@@ -50,31 +52,50 @@ df <- data.frame(x = rep(x_vals, 2),
 ggplot(df, aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = "Mean", y = "Variance")
+  labs(x = TeX("$\\mu_{ij}:\\; X_i \\beta_j + z_i + \\delta_j$"), 
+       y = "Variance")
 ggsave("simulation-data-generation/full.png")
 df %>% filter(x < 1280) %>% # 99% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = "Mean (up to 99th quantile of means)", y = "Variance")
-df %>% filter(x < 155) %>% # 95% of mu fall in this interval 
+  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+                           "0–99th quantiles shown")), 
+       y = "Variance")
+p95 <- df %>% filter(x < 155) %>% # 95% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = "Mean (up to 95th quantile of means)", y = "Variance") 
+  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+                           "0–95th quantiles shown")), 
+       y = "Variance")
 ggsave("simulation-data-generation/95th_quantile.png")
-df %>% filter(x < 8) %>% # 75% of mu fall in this interval 
+p75 <- df %>% filter(x < 8) %>% # 75% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = "Mean (up to 75th quantile of means)", y = "Variance") 
+  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+                           "0–75th quantiles shown")), 
+       y = "Variance")
 ggsave("simulation-data-generation/75th_quantile.png")
-df %>% filter(x < .7) %>% # 50% of mu fall in this interval 
+p50 <- df %>% filter(x < .7) %>% # 50% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = "Mean (up to 50th quantile of means)", y = "Variance") 
+  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+                           "0–50th quantiles shown")), 
+       y = "Variance")
 ggsave("simulation-data-generation/50th_quantile.png")
+
+library(ggpubr)
+ggarrange(p95, p75, p50, nrow = 1, common.legend = TRUE, legend = "bottom")
+ggsave("simulation-data-generation/mean_variance.pdf", width = 8, height = 5)
+
+# fn value at quantiles
+quants <- quantile(exp(as.vector(res_logmean)), c(0.95, 0.75, 0.5))
+fn(quants[1])/quants[1]
+fn(quants[2])/quants[2]
+fn(quants[3])/quants[3]
 
 # check on variance of simulated data 
 x_sims <- exp(seq(from = -100, to = 13, length.out = 5000))
