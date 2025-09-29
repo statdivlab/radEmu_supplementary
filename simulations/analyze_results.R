@@ -104,15 +104,12 @@ plot_res %>% filter(!too_many_na) %>%
   scale_x_sqrt(breaks=c(0,0.01,0.05,0.25,0.5,1)) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.25,0.5,1)) +
   coord_equal() +
-  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#332288",
-                                #"#0072B2", "#D55E00", "#CC79A7", 
-                                "#661100", "#999999")) +
-  scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash", 
-                                   #"longdash", "twodash", "dashed", 
-                                   "solid", "dotted")) + 
-  guides(color = guide_legend(nrow = 2, byrow = TRUE), linetype = guide_legend(nrow = 2, byrow = TRUE)) + 
+  scale_linetype_manual(values = c("dashed", "longdash", "dotdash", "dotted", "solid", "twodash")) + 
+  scale_color_manual(values = c("#E69F00", "#CC79A7", 
+                                "#661100", "#009E73", 
+                                "#3446eb",  "#56B4E9"))
 NULL
-ggsave("simulations/t1e.pdf", height = 8, width = 12)
+ggsave("simulations/revised_t1e.pdf", height = 8, width = 12)
 
 # additional methods
 plot_res %>% filter(!too_many_na) %>%
@@ -139,15 +136,12 @@ plot_res %>% filter(!too_many_na) %>%
   scale_x_sqrt(breaks=c(0,0.01,0.05,0.25,0.5,1)) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.25,0.5,1)) +
   coord_equal() +
-  scale_color_manual(values = c(#"#E69F00", "#56B4E9", "#009E73", "#332288",
-                                "#0072B2", "#D55E00", "#CC79A7", 
-                                "#661100", "#999999")) +
-  scale_linetype_manual(values = c(#"solid", "dashed", "dotted", "dotdash", 
-                                   "longdash", "twodash", "dashed", 
-                                   "solid", "dotted")) + 
-  guides(color = guide_legend(nrow = 2, byrow = TRUE), linetype = guide_legend(nrow = 2, byrow = TRUE)) + 
+  scale_color_manual(values = c("#E69F00", "#CC79A7", 
+                                "#661100",
+                                "#3446eb",  "#56B4E9")) + 
+  scale_linetype_manual(values = c("longdash", "dotdash", "dotted", "solid", "twodash")) + 
   NULL
-ggsave("simulations/t1e_additional.pdf", height = 8, width = 12)
+ggsave("simulations/revised_t1e_additional.pdf", height = 8, width = 12)
 
 lower <- 0.05 - qnorm(0.975) * sqrt(.05 * .95 / 500)
 upper <- 0.05 + qnorm(0.975) * sqrt(.05 * .95 / 500)
@@ -242,16 +236,13 @@ plot_res %>% filter(valid, !too_many_na) %>%
         plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12)) +
-  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#332288",
-                                #"#0072B2", "#D55E00", "#CC79A7", 
-                                "#661100", "#999999")) +
-  scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash", 
-                                   #"longdash", "twodash", "dashed", 
-                                   "solid", "dotted")) + 
-  guides(color = guide_legend(nrow = 2, byrow = TRUE), linetype = guide_legend(nrow = 2, byrow = TRUE)) + 
+  scale_linetype_manual(values = c("dashed", "longdash", "dotdash", "dotted", "solid", "twodash")) + 
+  scale_color_manual(values = c("#E69F00", "#CC79A7", 
+                                "#661100", "#009E73", 
+                                "#3446eb",  "#56B4E9")) + 
   theme(legend.position = "bottom") + 
   NULL
-ggsave("simulations/power.pdf", height = 8, width = 12)
+ggsave("simulations/revised_power.pdf", height = 8, width = 12)
 
 # additional methods
 plot_res %>% filter(valid, !too_many_na) %>% 
@@ -269,17 +260,13 @@ plot_res %>% filter(valid, !too_many_na) %>%
         plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12)) +
-  scale_color_manual(values = c(#"#E69F00", "#56B4E9", "#009E73", "#332288",
-                                "#0072B2", #"#D55E00", 
-                                "#CC79A7", 
-                                "#661100", "#999999")) +
-  scale_linetype_manual(values = c(#"solid", "dashed", "dotted", "dotdash", 
-                                   "longdash", #"twodash", 
-                                   "dashed", 
-                                   "solid", "dotted")) + 
-  guides(color = guide_legend(nrow = 2, byrow = TRUE), linetype = guide_legend(nrow = 2, byrow = TRUE)) + 
+  scale_color_manual(values = c("#E69F00", #"#CC79A7", 
+                                "#661100",
+                                "#3446eb",  "#56B4E9")) + 
+  scale_linetype_manual(values = c("longdash", #"dotdash", 
+                                   "dotted", "solid", "twodash")) + 
   theme(legend.position = "bottom") + 
   NULL
-ggsave("simulations/power_additional.pdf", height = 8, width = 12)
+ggsave("simulations/revised_power_additional.pdf", height = 8, width = 12)
 
 
