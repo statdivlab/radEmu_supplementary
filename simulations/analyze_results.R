@@ -23,7 +23,7 @@ results %>%
 # see which methods failed
 results %>% 
   tibble %>%
-  group_by(n, J, distn, abs(alt)) %>%
+  group_by(n, J, distn) %>%
   summarise(ald_na = mean(is.na(aldex_p)),
             anc_na = mean(is.na(ancom_p)),
             clr_na = mean(is.na(clr_p)),
@@ -269,4 +269,29 @@ plot_res %>% filter(valid, !too_many_na) %>%
   NULL
 ggsave("simulations/revised_power_additional.pdf", height = 8, width = 12)
 
+# timing info
+results %>% group_by(n, J, distn, abs(alt)) %>%
+  summarise(ald = median(aldex_time, na.rm = TRUE), 
+            anc = median(ancom_time, na.rm = TRUE),
+            clr = median(clr_time, na.rm = TRUE),
+            des = median(deseq_time, na.rm = TRUE),
+            lin = median(linda_time, na.rm = TRUE),
+            loc = median(locom_time, na.rm = TRUE),
+            mas = median(maaslin_time, na.rm = TRUE),
+            rad = median(rademu_time, na.rm = TRUE)) %>%
+  filter(n == 250 & distn == "ZINB") %>%
+  print(n = 21)
 
+# timing info
+results %>% group_by(n, J, distn, abs(alt)) %>%
+  summarise(ald = max(aldex_time, na.rm = TRUE), 
+            anc = max(ancom_time, na.rm = TRUE),
+            clr = max(clr_time, na.rm = TRUE),
+            des = max(deseq_time, na.rm = TRUE),
+            lin = max(linda_time, na.rm = TRUE),
+            loc = max(locom_time, na.rm = TRUE),
+            mas = max(maaslin_time, na.rm = TRUE),
+            rad = max(rademu_time, na.rm = TRUE)) %>%
+  filter(n == 250 & distn == "ZINB") %>%
+  print(n = 21)
+  

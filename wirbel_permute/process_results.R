@@ -137,4 +137,3 @@ summary(deseq_sum_small[1:20])
 summary(score_sum_small)
 summary(wald_sum_small)
 summary(ifaa_sum_small)
-
