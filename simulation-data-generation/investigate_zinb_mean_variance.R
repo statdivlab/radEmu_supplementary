@@ -49,43 +49,40 @@ x_vals <- exp(seq(from = -100, to = 13, length.out = 5000))
 df <- data.frame(x = rep(x_vals, 2), 
                  y = c(fn(x_vals), x_vals), 
                  Distribution = rep(c("ZINB", "Poisson"), each = 5000))
+df$x[1:5000] <- df$x[1:5000]*0.4
 ggplot(df, aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = TeX("$\\mu_{ij}:\\; X_i \\beta_j + z_i + \\delta_j$"), 
+  labs(x = "Mean", 
        y = "Variance")
-ggsave("simulation-data-generation/full.png")
-df %>% filter(x < 1280) %>% # 99% of mu fall in this interval 
+df %>% filter(x < 1280*0.4) %>% # 99% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+  labs(x = expression(atop("Mean",
                            "0–99th quantiles shown")), 
        y = "Variance")
-p95 <- df %>% filter(x < 155) %>% # 95% of mu fall in this interval 
+p95 <- df %>% filter(x < 155*0.4) %>% # 95% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+  labs(x = expression(atop("Mean",
                            "0–95th quantiles shown")), 
        y = "Variance")
-ggsave("simulation-data-generation/95th_quantile.png")
-p75 <- df %>% filter(x < 8) %>% # 75% of mu fall in this interval 
+p75 <- df %>% filter(x < 8*0.4) %>% # 75% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+  labs(x = expression(atop("Mean",
                            "0–75th quantiles shown")), 
        y = "Variance")
-ggsave("simulation-data-generation/75th_quantile.png")
-p50 <- df %>% filter(x < .7) %>% # 50% of mu fall in this interval 
+p50 <- df %>% filter(x < .7*.4) %>% # 50% of mu fall in this interval 
   ggplot(aes(x = x, y = y, color = Distribution)) +
   geom_line() + 
   theme_bw() + 
-  labs(x = expression(atop(mu[ij] * ": " ~ X[i] * beta[j] + z[i] + delta[j],
+  labs(x = expression(atop("Mean",
                            "0–50th quantiles shown")), 
        y = "Variance")
-ggsave("simulation-data-generation/50th_quantile.png")
 
 library(ggpubr)
 ggarrange(p95, p75, p50, nrow = 1, common.legend = TRUE, legend = "bottom")
